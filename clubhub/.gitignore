@@ -65,6 +65,9 @@
 **/ios/ServiceDefinitions.json
 **/ios/Runner/GeneratedPluginRegistrant.*
 
+#Firebase
+google-services.json
+
 # Web related
 lib/generated_plugin_registrant.dart
 
