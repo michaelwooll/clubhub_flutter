@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: MyHomePage(title: 'Flutter Demo Home Page test'),
     );
   }
 }
@@ -48,7 +48,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() {
-    Firestore.instance.collection('test').add({"title":"hello world" + _counter.toString(), "desc" : "this is a test"});
+    Firestore.instance.collection('testtop').add({"title":"hello world" + _counter.toString(), "desc" : "this is a test"});
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
