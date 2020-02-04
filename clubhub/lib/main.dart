@@ -1,5 +1,5 @@
+import 'package:clubhub/dbScheme.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() => runApp(MyApp());
 
@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page test'),
+      home: MyHomePage(title: 'Clubhub'),
     );
   }
 }
@@ -48,7 +48,6 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
 
   void _incrementCounter() {
-    Firestore.instance.collection('testtop').add({"title":"hello world" + _counter.toString(), "desc" : "this is a test"});
     setState(() {
       // This call to setState tells the Flutter framework that something has
       // changed in this State, which causes it to rerun the build method below
@@ -57,6 +56,21 @@ class _MyHomePageState extends State<MyHomePage> {
       // called again, and so nothing would appear to happen.
       _counter++;
     });
+  }
+
+  void _addChicoDB() async{
+    // Check if Chico already exists
+    final docDoesExist = await doesDocumentExist("campus", "name", "CSU Chico");
+    if(docDoesExist != ""){
+      debugPrint("CSU Chico already exists, the ID is: " + docDoesExist);
+    }
+    else{
+      var x = new Campus("campus", "CSU Chico", Authentication_type.GoogleLogin);
+      bool success = await x.saveToDatabase();
+      if(success){
+        debugPrint("document created");
+      }
+    }
   }
 
   @override
@@ -99,6 +113,12 @@ class _MyHomePageState extends State<MyHomePage> {
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.display1,
+            ),
+            RaisedButton(
+              onPressed: _addChicoDB,
+              child: Text(
+                "Add Chico to database"
+              )
             ),
           ],
         ),
