@@ -1,5 +1,9 @@
-import 'package:clubhub/dbScheme.dart';
+import 'package:clubhub/models/Club.dart';
+import 'package:clubhub/models/DatabaseObject.dart';
+import 'package:clubhub/models/Campus.dart';
+import 'package:clubhub/models/DatabaseHelperFunctions.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 void main() => runApp(MyApp());
 
@@ -73,6 +77,54 @@ class _MyHomePageState extends State<MyHomePage> {
     }
   }
 
+    void _addFakeClubDB() async{
+    // Check if Chico already exists
+    final docDoesExist = await doesDocumentExist("club", "name", "Fake club");
+    if(docDoesExist != ""){
+      debugPrint("Fake club already exists, the ID is: " + docDoesExist);
+    }
+    else{
+      var x = new Club("club", "Fake club", "This is a fake description of this lame ass club. What is up!", false);
+      bool success = await x.saveToDatabase();
+      if(success){
+        debugPrint("document created");
+      }
+    }
+  }
+
+  void _testCreateObject() async{
+    final QuerySnapshot result = await Firestore.instance
+    .collection("campus")
+    .where("name", isEqualTo: "CSU Chico")
+    .limit(1)
+    .getDocuments();
+    DocumentSnapshot x = result.documents[0];
+
+    Campus y = createDatabaseObjectFromReference(DatabaseType.Campus,x);
+    if(y == null){
+      debugPrint("null");
+    }else{
+      debugPrint(y.toJson().toString());
+    }
+
+  }
+  void _testClubCreate() async{
+    final QuerySnapshot result = await Firestore.instance
+    .collection("club")
+    .where("name", isEqualTo: "Fake club")
+    .limit(1)
+    .getDocuments();
+    DocumentSnapshot x = result.documents[0];
+
+    Club y = createDatabaseObjectFromReference(DatabaseType.Club,x);
+    if(y == null){
+      debugPrint("null");
+    }else{
+      debugPrint(y.toJson().toString());
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -118,6 +170,24 @@ class _MyHomePageState extends State<MyHomePage> {
               onPressed: _addChicoDB,
               child: Text(
                 "Add Chico to database"
+              )
+            ),
+            RaisedButton(
+              onPressed: _testCreateObject,
+              child: Text(
+                "Test create object"
+              )
+            ),
+            RaisedButton(
+              onPressed: _addFakeClubDB,
+              child: Text(
+                "Add fake club"
+              )
+            ),
+            RaisedButton(
+              onPressed: _testClubCreate,
+              child: Text(
+                "Test create club object"
               )
             ),
           ],
