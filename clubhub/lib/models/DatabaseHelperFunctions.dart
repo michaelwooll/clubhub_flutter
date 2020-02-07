@@ -4,7 +4,6 @@
 /// [Description]: This holds functions that interact with the Firebase database, but are not related to a specific model.
 
 /*************** TODO *******************
- * Add all model types to createDatabaseObjectFromReference function
  * Create getter functions for Club model
  */
 
@@ -57,4 +56,22 @@ DatabaseObject createDatabaseObjectFromReference(DatabaseType desiredType, Docum
       return null;
     }
   }
+}
+/*  TODO FIX! 
+* Add description!
+* Currently uses a tempID to query
+* Add a global Campus class when user is signed in
+*/
+Future<List<Club>> retrieveAllClubs() async{
+  List<Club> clubList = [];
+  String tempID = "MzMsjEsaAIBTeWbcCsio";
+  final QuerySnapshot result = await Firestore.instance
+  .collection("club")
+  .where("campusID", isEqualTo: tempID)
+  .getDocuments();
+
+  for(var ds in result.documents){
+    clubList.add(createDatabaseObjectFromReference(DatabaseType.Club,ds));
+  }
+  return clubList;
 }

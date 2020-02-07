@@ -33,8 +33,8 @@ abstract class DatabaseObject{
   /// Uses the objects overrided [toJson()] function to add a document to the [_collection]
   Future<bool> saveToDatabase() async{
     try{
-      Map<String,dynamic> json = toJson();
-      json['type'] = EnumToString.parse(getType());
+      Map<String,dynamic> json = toJson(); 
+      json['type'] = EnumToString.parse(getType()); // Add the objects type to the json
       Firestore.instance.collection(_collection).add(json);
     }catch(e){
       debugPrint("Error in saveToDatabase: " + e);

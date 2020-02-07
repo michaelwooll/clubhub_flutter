@@ -78,18 +78,28 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
     void _addFakeClubDB() async{
-    // Check if Chico already exists
-    final docDoesExist = await doesDocumentExist("club", "name", "Fake club");
+    // grab chicos ID
+    String schoolID = await doesDocumentExist("campus", "name", "CSU Chico");
+    // Check if Club already exists
+    final docDoesExist = await doesDocumentExist("club", "name", "Fake club2");
     if(docDoesExist != ""){
       debugPrint("Fake club already exists, the ID is: " + docDoesExist);
     }
     else{
-      var x = new Club("club", "Fake club", "This is a fake description of this lame ass club. What is up!", false);
+      var x = new Club("club", "Fake club2", "This is a 2 fake description of this lame ass club. What is up!", false, schoolID);
       bool success = await x.saveToDatabase();
       if(success){
         debugPrint("document created");
       }
     }
+    debugPrint("Heres a list of the clubs");
+    // Check all documents
+    List<Club> clubs = await retrieveAllClubs();
+    for(var item in clubs){
+      debugPrint(item.toJson().toString());
+    }
+    debugPrint("End list!");
+
   }
 
   void _testCreateObject() async{

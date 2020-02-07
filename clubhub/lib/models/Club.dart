@@ -13,6 +13,7 @@ class Club extends DatabaseObject{
   String _name;
   String _description;
   bool _exclusive;
+  String _campusID;
   // photo
   // schedule
   // userList
@@ -20,12 +21,13 @@ class Club extends DatabaseObject{
 
 
 
-  Club(String collection , this._name, this._description, this._exclusive):super(collection, DatabaseType.Club);
+  Club(String collection , this._name, this._description, this._exclusive, this._campusID):super(collection, DatabaseType.Club);
   Club.fromDocumentSnapshot(DocumentSnapshot ds):super("club", DatabaseType.Club){
     /* Do stuff */
     _name = ds["name"];
     _description = ds["description"];
     _exclusive = ds ["exclusive"];
+    _campusID = ds["campusID"];
   }
 
   String getName() => _name;
@@ -37,7 +39,8 @@ class Club extends DatabaseObject{
   Map<String, dynamic> toJson () => {
     'name': _name,
     'description' : _description,
-    'exclusive' : _exclusive
+    'exclusive' : _exclusive,
+    'campusID' : _campusID
   };
 
 }
