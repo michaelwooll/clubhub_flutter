@@ -3,6 +3,7 @@
 /// 
 /// [Description]: This holds functions that interact with the Firebase database, but are not related to a specific model.
 
+
 /*************** TODO *******************
  * Create getter functions for Club model
  */
@@ -69,7 +70,7 @@ Future<List<Club>> retrieveAllClubs() async{
   .collection("club")
   .where("campusID", isEqualTo: tempID)
   .getDocuments();
-
+  
   for(var ds in result.documents){
     clubList.add(createDatabaseObjectFromReference(DatabaseType.Club,ds));
   }
