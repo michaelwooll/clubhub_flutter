@@ -26,16 +26,24 @@ abstract class DatabaseObject{
   /// Getter to return [_type] variable.
   DatabaseType getType() => this._type;
   
+
   /// Coverts calls into JSON object to allow for Firebase Storage
   /// This is overrided by every inherited class
   Map<String, dynamic> toJson (); 
+
+  /// Helper function to write to cross reference table during saveToDatabase() calls
+  /// this function is overwritten in models with many to many relationships
+  Future<void> updateCrossReferenceTable(String documentID) async{
+    return;
+  }
 
   /// Uses the objects overrided [toJson()] function to add a document to the [_collection]
   Future<bool> saveToDatabase() async{
     try{
       Map<String,dynamic> json = toJson(); 
       json['type'] = EnumToString.parse(getType()); // Add the objects type to the json
-      Firestore.instance.collection(_collection).add(json);
+      DocumentReference doc = await Firestore.instance.collection(_collection).add(json);
+      updateCrossReferenceTable(doc.documentID);
     }catch(e){
       debugPrint("Error in saveToDatabase: " + e);
       return false;

@@ -1,19 +1,19 @@
-/// [File]: ClubWidgets.dart
+/// [File]: EventWidget.dart
 /// [Author]: Michael Wooll
 /// 
-/// [Description]: This file contains all the methods to convert Club objects into Widgets that the application
+/// [Description]: This file contains all the methods to convert Event objects into Widgets that the application
 /// will use
 /// 
-import 'package:clubhub/models/Club.dart';
+import 'package:clubhub/models/Event.dart';
 import 'package:clubhub/models/DatabaseHelperFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
 /// [Stateless widget] that displays a clubs information in a [Card] format
 ///Used https://api.flutter.dev/flutter/material/Card-class.html for reference
-class ClubCard extends StatelessWidget {
-  final Club club; // Club object that will hold all the club data
-  const ClubCard({Key key, this.club}): super(key:key); 
+class EventCard extends StatelessWidget {
+  final Event event; // Club object that will hold all the club data
+  const EventCard({Key key, this.event}): super(key:key); 
 
   @override
   Widget build(BuildContext context){
@@ -23,9 +23,9 @@ class ClubCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             ListTile(
-              leading: Icon(Icons.home),
-              title: Text(club.getName()),
-              subtitle: Text(club.getDescription())
+              leading: Icon(Icons.note),
+              title: Text(event.getTitle()),
+              subtitle: Text(event.getDescription())
             ) // ListTitle
           ], // End children widget
         ), // Column
@@ -36,23 +36,23 @@ class ClubCard extends StatelessWidget {
 
 
 /// Stateful Widget that creates a ListView based on the current state of the [_clubs] list
-class ClubList extends StatefulWidget{
-  const ClubList({Key key}):super(key:key);
+class EventList extends StatefulWidget{
+  const EventList({Key key}):super(key:key);
 
   @override
-  _ClubListState createState() => new _ClubListState();
+  _EventListState createState() => new _EventListState();
 } 
 
 
-class _ClubListState extends State<ClubList>{
-  List<Club> _clubs = []; // State of the club list  
+class _EventListState extends State<EventList>{
+  List<Event> _events = []; // State of the club list  
   @override
   void initState() {
     super.initState();
     // Grab club list asynchonously then set state
-    retrieveAllClubs().then((value){
+    retrieveAllEvents().then((value){
       setState(() {
-        _clubs = value;
+        _events = value;
       }
       ); 
     });
@@ -61,10 +61,10 @@ class _ClubListState extends State<ClubList>{
 /// This refresh handler will retrieve the most up to date clublist
 /// and set the [_club] list state.
   Future<Null> _handleRefresh() async{
-    List<Club> list= await retrieveAllClubs();
+    List<Event> list= await retrieveAllEvents();
     debugPrint(list.length.toString());
     setState(() {
-      _clubs = list;
+      _events = list;
     });
     return null;
   }
@@ -74,7 +74,7 @@ class _ClubListState extends State<ClubList>{
     // 
     List<Widget> children = []; 
     // If the list is currenty empty we are fetching from DB, Show load circle.
-    if(_clubs.isEmpty){
+    if(_events.isEmpty){
       children = <Widget>[
             const Padding(
               padding: EdgeInsets.only(top: 100),
@@ -89,15 +89,15 @@ class _ClubListState extends State<ClubList>{
             const Padding(
               padding: EdgeInsets.only(top: 20),
               child: Center(
-                child: Text('Fetching clubs...'),
+                child: Text('Fetching events...'),
               )
             )
       ];
     } // end if
     // Else we have data, build a list of ClubCard's
     else{
-      for(var c in _clubs){
-        children.add(ClubCard(club: c));
+      for(var e in _events){
+        children.add(EventCard(event: e));
       } // end for
     }// end else
     

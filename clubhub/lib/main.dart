@@ -1,10 +1,16 @@
 import 'package:clubhub/models/Club.dart';
+import 'package:clubhub/models/Event.dart';
+
 import 'package:clubhub/models/DatabaseObject.dart';
 import 'package:clubhub/models/Campus.dart';
 import 'package:clubhub/models/DatabaseHelperFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clubhub/widgets/ClubWidgets.dart';
+import 'package:clubhub/widgets/EventWidgets.dart';
+
+
+import 'dart:math';
 
 
 void main() => runApp(MyApp());
@@ -32,6 +38,19 @@ class MyApp extends StatelessWidget {
   }
 }
 
+  Future<void> createFakeEvent() async{
+    String id = await doesDocumentExist("club", "name", "Fake club1");
+    Random random = new Random();
+    String eName = "Event" + random.nextInt(500).toString();
+    Event e = new Event("event",eName,"This is a description about the club event! Wow sounds like fun!",id,DateTime.now());
+    e.saveToDatabase();
+    debugPrint("here");
+    List<Event> x = await retrieveEventsForClub(id);
+    for (var event in x){
+      debugPrint(event.getTitle());
+    }
+  }
+
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
 
@@ -51,93 +70,33 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+  int _pageIndex= 0;
   //Future<List<Club>> clubs = retrieveAllClubs();
 
-  void _incrementCounter() {
+  void _onItemTapped(int index) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _pageIndex = index;
     });
   }
 
-  void _addChicoDB() async{
-    // Check if Chico already exists
-    final docDoesExist = await doesDocumentExist("campus", "name", "CSU Chico");
-    if(docDoesExist != ""){
-      debugPrint("CSU Chico already exists, the ID is: " + docDoesExist);
+
+
+  Widget getWidgetOption(int index){
+    if(index >= _widgetOptions.length){
+      return null;
     }
-    else{
-      var x = new Campus("campus", "CSU Chico", Authentication_type.GoogleLogin);
-      bool success = await x.saveToDatabase();
-      if(success){
-        debugPrint("document created");
-      }
+    else {
+      return _widgetOptions.elementAt(index);
     }
   }
 
-    void _addFakeClubDB(String name, String desc) async{
-    // grab chicos ID
-    String schoolID = await doesDocumentExist("campus", "name", "CSU Chico");
-    // Check if Club already exists
-    final docDoesExist = await doesDocumentExist("club", "name", name);
-    if(docDoesExist != ""){
-      debugPrint("Fake club already exists, the ID is: " + docDoesExist);
-    }
-    else{
-      var x = new Club("club", name, desc, false, schoolID);
-      bool success = await x.saveToDatabase();
-      if(success){
-        debugPrint("document created");
-      }
-    }
-    debugPrint("Heres a list of the clubs");
-    // Check all documents
-    List<Club> clubs = await retrieveAllClubs();
-    for(var item in clubs){
-      debugPrint(item.toJson().toString());
-    }
-    debugPrint("End list!");
 
-  }
 
-  void _testCreateObject() async{
-    final QuerySnapshot result = await Firestore.instance
-    .collection("campus")
-    .where("name", isEqualTo: "CSU Chico")
-    .limit(1)
-    .getDocuments();
-    DocumentSnapshot x = result.documents[0];
-
-    Campus y = createDatabaseObjectFromReference(DatabaseType.Campus,x);
-    if(y == null){
-      debugPrint("null");
-    }else{
-      debugPrint(y.toJson().toString());
-    }
-
-  }
-  void _testClubCreate() async{
-    final QuerySnapshot result = await Firestore.instance
-    .collection("club")
-    .where("name", isEqualTo: "Fake club")
-    .limit(1)
-    .getDocuments();
-    DocumentSnapshot x = result.documents[0];
-
-    Club y = createDatabaseObjectFromReference(DatabaseType.Club,x);
-    if(y == null){
-      debugPrint("null");
-    }else{
-      debugPrint(y.toJson().toString());
-    }
-
-  }
-  
+  static const List<Widget> _widgetOptions = <Widget>[
+    EventList(),
+    Text("Calendar"),
+    ClubList(),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -156,18 +115,20 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
-        child: ClubList()
+        child: getWidgetOption(_pageIndex)
       ),
       bottomNavigationBar: 
       BottomNavigationBar(
+        currentIndex: _pageIndex,
+        onTap: _onItemTapped,
         items: [
           BottomNavigationBarItem(
               icon: Icon(Icons.home),
               title: Text('Home'),
           ),
           BottomNavigationBarItem(
-              icon: Icon(Icons.category),
-              title: Text('Categories'),
+              icon: Icon(Icons.calendar_today),
+              title: Text('Calendar'),
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.search),

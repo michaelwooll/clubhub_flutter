@@ -1,4 +1,4 @@
-/// [File]: DatabaseObject.dart
+/// [File]: Club.dart
 /// [Author]: Michael Wooll
 /// 
 /// [Description]: This holds the model that represents a Club.
