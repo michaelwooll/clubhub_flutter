@@ -9,10 +9,10 @@ import 'package:clubhub/models/DatabaseHelperFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
-/// [Stateless widget] that displays a clubs information in a [Card] format
+/// [Stateless widget] that displays an events information in a [Card] format
 ///Used https://api.flutter.dev/flutter/material/Card-class.html for reference
 class EventCard extends StatelessWidget {
-  final Event event; // Club object that will hold all the club data
+  final Event event; // Event object that will hold all the event data
   const EventCard({Key key, this.event}): super(key:key); 
 
   @override
@@ -35,7 +35,7 @@ class EventCard extends StatelessWidget {
 }
 
 
-/// Stateful Widget that creates a ListView based on the current state of the [_clubs] list
+/// Stateful Widget that creates a ListView based on the current state of the [_events] list
 class EventList extends StatefulWidget{
   const EventList({Key key}):super(key:key);
 
@@ -45,11 +45,11 @@ class EventList extends StatefulWidget{
 
 
 class _EventListState extends State<EventList>{
-  List<Event> _events = []; // State of the club list  
+  List<Event> _events = []; // State of the event list  
   @override
   void initState() {
     super.initState();
-    // Grab club list asynchonously then set state
+    // Grab event list asynchonously then set state
     retrieveAllEvents().then((value){
       setState(() {
         _events = value;
@@ -58,8 +58,8 @@ class _EventListState extends State<EventList>{
     });
   }
 
-/// This refresh handler will retrieve the most up to date clublist
-/// and set the [_club] list state.
+/// This refresh handler will retrieve the most up to date eventlist
+/// and set the [_events] list state.
   Future<Null> _handleRefresh() async{
     List<Event> list= await retrieveAllEvents();
     debugPrint(list.length.toString());
@@ -94,7 +94,7 @@ class _EventListState extends State<EventList>{
             )
       ];
     } // end if
-    // Else we have data, build a list of ClubCard's
+    // Else we have data, build a list of EventCard's
     else{
       for(var e in _events){
         children.add(EventCard(event: e));
