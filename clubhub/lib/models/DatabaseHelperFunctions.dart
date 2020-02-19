@@ -16,6 +16,9 @@ import 'package:enum_to_string/enum_to_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
+import 'dart:math';
+
+
 /// Checks if document exists in Firebase Cloudstore instance. Used to ensure there are no duplicate's in DB.
 /// 
 /// Returns the documentID, if a document in a [collection] has a [key] property that stores [value]
@@ -62,6 +65,20 @@ DatabaseObject createDatabaseObjectFromReference(DatabaseType desiredType, Docum
     }
   }
 }
+
+Future<List<Campus>> retrieveAllCampus() async{
+  List<Campus> campusList = [];
+  final QuerySnapshot result = await Firestore.instance
+  .collection("campus")
+  .getDocuments();
+  
+  for(var ds in result.documents){
+    campusList.add(createDatabaseObjectFromReference(DatabaseType.Campus,ds));
+  }
+  return campusList;
+}
+
+
 /*  TODO FIX! 
 * Add description!
 * Currently uses a tempID to query
@@ -99,6 +116,7 @@ Future<List<Event>> retrieveEventsForClub(String clubID) async {
 }
 
 Future<List<Event>> retrieveAllEvents() async{
+  createFakeEvent();
   List<String> cludID = [];
   List<Event> events = [];
   final QuerySnapshot result = await Firestore.instance
@@ -117,6 +135,19 @@ Future<List<Event>> retrieveAllEvents() async{
   }
   return events;
 }
+
+ Future<void> createFakeEvent() async{
+    String id = await doesDocumentExist("club", "name", "Fake club1");
+    Random random = new Random();
+    String eName = "Event" + random.nextInt(500).toString();
+    Event e = new Event("event",eName,"This is a description about the club event! Wow sounds like fun!",id,DateTime.now());
+    e.saveToDatabase();
+    debugPrint("here");
+    List<Event> x = await retrieveEventsForClub(id);
+    for (var event in x){
+      debugPrint(event.getTitle());
+    }
+  }
 
 /*
   void _addChicoDB() async{

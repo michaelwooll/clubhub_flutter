@@ -1,16 +1,8 @@
-import 'package:clubhub/models/Club.dart';
-import 'package:clubhub/models/Event.dart';
-
-import 'package:clubhub/models/DatabaseObject.dart';
-import 'package:clubhub/models/Campus.dart';
-import 'package:clubhub/models/DatabaseHelperFunctions.dart';
+import 'package:clubhub/LogInPage.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:clubhub/widgets/ClubWidgets.dart';
 import 'package:clubhub/widgets/EventWidgets.dart';
-
-
-import 'dart:math';
+import 'package:clubhub/auth.dart';
 
 
 void main() => runApp(MyApp());
@@ -33,23 +25,12 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Clubhub'),
+        //home: MyHomePage(title: "ClubHub"),
+        home: LoginPage() 
     );
   }
 }
 
-  Future<void> createFakeEvent() async{
-    String id = await doesDocumentExist("club", "name", "Fake club1");
-    Random random = new Random();
-    String eName = "Event" + random.nextInt(500).toString();
-    Event e = new Event("event",eName,"This is a description about the club event! Wow sounds like fun!",id,DateTime.now());
-    e.saveToDatabase();
-    debugPrint("here");
-    List<Event> x = await retrieveEventsForClub(id);
-    for (var event in x){
-      debugPrint(event.getTitle());
-    }
-  }
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key key, this.title}) : super(key: key);
@@ -71,7 +52,6 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _pageIndex= 0;
-  //Future<List<Club>> clubs = retrieveAllClubs();
 
   void _onItemTapped(int index) {
     setState(() {
@@ -92,9 +72,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
 
 
-  static const List<Widget> _widgetOptions = <Widget>[
+  static List<Widget> _widgetOptions = <Widget>[
     EventList(),
-    Text("Calendar"),
+    Text("calendar"),
     ClubList(),
   ];
 
@@ -115,6 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
         // in the middle of the parent.
+
         child: getWidgetOption(_pageIndex)
       ),
       bottomNavigationBar: 

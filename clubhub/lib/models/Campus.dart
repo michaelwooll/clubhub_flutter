@@ -17,16 +17,21 @@ enum Authentication_type{
 class Campus extends DatabaseObject{
   String _name;
   Authentication_type _auth;
+  String _id;
 
-  Campus(String collection, this._name, this._auth):super(collection, DatabaseType.Campus);
+  Campus(String collection, this._name, this._auth,this._id):super(collection, DatabaseType.Campus);
   Campus.fromDocumentSnapshot(DocumentSnapshot ds):super("campus", DatabaseType.Campus){
     _name = ds["name"];
     _auth = EnumToString.fromString(Authentication_type.values, ds["auth"]);
+    _id = ds.documentID;
   }
 
   String getName() => _name;
 
   Authentication_type getAuthType() => _auth;
+
+  String getID() => _id;
+
 
   Map<String, dynamic> toJson () => {
     'name' : _name,
