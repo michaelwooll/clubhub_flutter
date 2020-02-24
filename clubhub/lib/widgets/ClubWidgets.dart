@@ -23,9 +23,9 @@ class ClubCard extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
             ListTile(
-              leading: Icon(Icons.home),
+              leading: Image.network(club.getImgURL()),
               title: Text(club.getName()),
-              subtitle: Text(club.getDescription())
+              subtitle: Text(club.getShortDescription())
             ) // ListTitle
           ], // End children widget
         ), // Column

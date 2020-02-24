@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:clubhub/widgets/ClubWidgets.dart';
 import 'package:clubhub/widgets/EventWidgets.dart';
 import 'package:clubhub/auth.dart';
+import 'package:clubhub/models/DatabaseHelperFunctions.dart';
 
 
 void main() => runApp(MyApp());
@@ -74,7 +75,13 @@ class _MyHomePageState extends State<MyHomePage> {
 
   static List<Widget> _widgetOptions = <Widget>[
     EventList(),
-    Text("calendar"),
+    RaisedButton(
+      onPressed: (){
+        loadInClubs("C:/Users/Michael/Desktop/repos/clubhub_flutter/clubhub/scraper/club_data.csv");
+      },
+    )
+    ,
+   // Text("calendar"),
     ClubList(),
   ];
 

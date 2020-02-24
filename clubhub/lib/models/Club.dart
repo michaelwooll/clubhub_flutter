@@ -14,6 +14,7 @@ class Club extends DatabaseObject{
   String _description;
   bool _exclusive;
   String _campusID;
+  String _imgURL;
   // photo
   // schedule
   // userList
@@ -21,18 +22,31 @@ class Club extends DatabaseObject{
 
 
 
-  Club(String collection , this._name, this._description, this._exclusive, this._campusID):super(collection, DatabaseType.Club);
+  Club(String collection , this._name, this._description, this._exclusive, this._campusID, this._imgURL):super(collection, DatabaseType.Club);
   Club.fromDocumentSnapshot(DocumentSnapshot ds):super("club", DatabaseType.Club){
-    /* Do stuff */
     _name = ds["name"];
     _description = ds["description"];
     _exclusive = ds ["exclusive"];
     _campusID = ds["campusID"];
+    _imgURL = ds["img_url"];
   }
 
   String getName() => _name;
 
   String getDescription() => _description;
+
+  String getShortDescription(){
+    if(_description.length > 100){
+      String ret = _description.substring(0,99);
+      ret += "...";
+      return ret;
+    }
+    else{
+      return _description;
+    }
+  }
+
+  String getImgURL() => _imgURL;
 
   bool isExclusive() => _exclusive;
 

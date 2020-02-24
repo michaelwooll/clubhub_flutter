@@ -16,6 +16,12 @@ import 'package:enum_to_string/enum_to_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
 
+
+import 'dart:convert';
+import 'package:csv/csv.dart';
+import 'dart:io';
+  
+
 import 'dart:math';
 
 
@@ -89,6 +95,7 @@ Future<List<Club>> retrieveAllClubs() async{
   String tempID = "MzMsjEsaAIBTeWbcCsio";
   final QuerySnapshot result = await Firestore.instance
   .collection("club")
+  .orderBy("name")
   .where("campusID", isEqualTo: tempID)
   .getDocuments();
   
@@ -103,20 +110,29 @@ Future<List<Club>> retrieveAllClubs() async{
 Future<List<Event>> retrieveEventsForClub(String clubID) async {
   List<Event> eventList = [];
 
-  final QuerySnapshot result = await Firestore.instance
+  /*final QuerySnapshot result = await Firestore.instance
   .collection("event")
   .where("clubID", isEqualTo:clubID)
   .getDocuments();
+*/
 
-  for(var ds in result.documents){
-    eventList.add(createDatabaseObjectFromReference(DatabaseType.Event, ds));
-  }
+     final QuerySnapshot result = await Firestore.instance
+    .collection("event")
+    .where("clubID", isEqualTo: clubID)
+    .getDocuments();
+
+
+    for(var ds in result.documents){
+      eventList.add(createDatabaseObjectFromReference(DatabaseType.Event, ds));
+    }
+ 
+
 
   return eventList;
 }
 
 Future<List<Event>> retrieveAllEvents() async{
-  createFakeEvent();
+  //createFakeEvent();
   List<String> cludID = [];
   List<Event> events = [];
   final QuerySnapshot result = await Firestore.instance
@@ -130,23 +146,41 @@ Future<List<Event>> retrieveAllEvents() async{
   for(var id in cludID){
     List<Event> e = await retrieveEventsForClub(id);
     for(var item in e){
-      events.add(item);
-    }
+        events.add(item);
+      }
   }
   return events;
 }
 
+Future<List<String>> retrieveAllClubIDs() async {
+  List<String> clubID = [];
+  final QuerySnapshot result = await Firestore.instance
+  .collection("club")
+  .getDocuments();
+
+  for(var ds in result.documents){
+    clubID.add(ds.documentID);
+  }
+
+  return clubID;
+
+}
+
  Future<void> createFakeEvent() async{
-    String id = await doesDocumentExist("club", "name", "Fake club1");
+    List<String> idList = await retrieveAllClubIDs();
     Random random = new Random();
+    int index = random.nextInt(idList.length-1);
     String eName = "Event" + random.nextInt(500).toString();
-    Event e = new Event("event",eName,"This is a description about the club event! Wow sounds like fun!",id,DateTime.now());
+    Event e = new Event("event",eName,"This is a description about the club event! Wow sounds like fun!",idList[index],DateTime.now());
     e.saveToDatabase();
-    debugPrint("here");
-    List<Event> x = await retrieveEventsForClub(id);
-    for (var event in x){
-      debugPrint(event.getTitle());
-    }
+  }
+
+  Future<void> loadInClubs(path) async {
+    new File(path)
+    .openRead()
+    .transform(utf8.decoder)
+    .transform(new LineSplitter())
+    .forEach((l) => print('line: $l'));
   }
 
 /*

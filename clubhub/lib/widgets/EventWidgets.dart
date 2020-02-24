@@ -49,23 +49,36 @@ class _EventListState extends State<EventList>{
   @override
   void initState() {
     super.initState();
-    // Grab event list asynchonously then set state
-    retrieveAllEvents().then((value){
-      setState(() {
-        _events = value;
+    //createFakeEvent();
+    // Grab events club by club
+    retrieveAllClubIDs().then((value){
+      for(var id in value){
+        retrieveEventsForClub(id).then((events){
+          setState(() {
+            _events += events;
+          });
+        });
       }
-      ); 
     });
   }
 
 /// This refresh handler will retrieve the most up to date eventlist
 /// and set the [_events] list state.
   Future<Null> _handleRefresh() async{
-    List<Event> list= await retrieveAllEvents();
-    debugPrint(list.length.toString());
     setState(() {
-      _events = list;
+      _events = [];
     });
+
+    retrieveAllClubIDs().then((value){
+      for(var id in value){
+        retrieveEventsForClub(id).then((events){
+          setState(() {
+            _events += events;
+          });
+        });
+      }
+    });
+
     return null;
   }
   
