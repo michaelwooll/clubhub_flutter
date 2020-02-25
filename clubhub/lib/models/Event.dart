@@ -6,7 +6,6 @@
 
 import 'package:clubhub/models/DatabaseObject.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 
 
 /// Contains information about an [Event] that is associated with a club

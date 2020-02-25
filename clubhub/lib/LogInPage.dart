@@ -1,9 +1,17 @@
+/// [File]: LogInPage.dart
+/// [Author]: Michael Wooll
+/// 
+/// [Description]: This file contains all the methods and widgets to create the Log-in page
+/// 
+/// 
 import 'package:clubhub/main.dart';
 import 'package:flutter/material.dart';
 import 'package:clubhub/models/DatabaseHelperFunctions.dart';
 import 'package:clubhub/models/Campus.dart';
+import 'package:clubhub/auth.dart';
 
 
+/// Root of the Log-in Page
 class LoginPage extends StatefulWidget{
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -12,6 +20,7 @@ class LoginPage extends StatefulWidget{
 class _LoginPageState extends State<LoginPage>{
   List<Campus> _campusList = [];
   Campus _selectedCampus;
+  bool _isAuthenticating = false;
 
   void initState() {
     super.initState();
@@ -32,9 +41,29 @@ class _LoginPageState extends State<LoginPage>{
     if(_campusList.isEmpty){
       children.add(Text("Splash screen here"));
     }
+    else if(_isAuthenticating){
+      // Spin loading wheel for authenticating
+      children = <Widget>[
+            const Padding(
+              padding: EdgeInsets.only(top: 100),
+            ),
+            Center(
+              child: SizedBox(
+              child: CircularProgressIndicator(),
+              width: 100,
+              height: 100,
+            )
+            ),
+            const Padding(
+              padding: EdgeInsets.only(top: 20),
+              child: Center(
+                child: Text('Authenticating'),
+              )
+            )
+      ];
+    }
     else{
       Text campusSelectText = new Text("Select your campus");
-
       DropdownButton campusSelect = new DropdownButton<Campus>(
           items: _campusList.map((Campus campus) {
             return new DropdownMenuItem<Campus>(
@@ -51,10 +80,9 @@ class _LoginPageState extends State<LoginPage>{
       );
 
       LoginWidget loginWidget = new LoginWidget(
-        authType: _selectedCampus.getAuthType()
+        authType: _selectedCampus.getAuthType(),
+        campusID: _selectedCampus.getID()
       ); // LoginWidget
-
-
       children.add(campusSelectText);
       children.add(campusSelect);
       children.add(loginWidget);
@@ -72,31 +100,44 @@ class _LoginPageState extends State<LoginPage>{
 
 
 
-
+/// Returns the needed Sign In UI based on the Campus' specified [authType]
 class LoginWidget extends StatelessWidget {
   final Authentication_type authType;
-  const LoginWidget({Key key, this.authType}):super(key:key);
+  final String campusID;
+
+  const LoginWidget({Key key, this.authType, this.campusID}):super(key:key);
 
   @override
   Widget build(BuildContext context){
-    if(authType == Authentication_type.GoogleLogin){
-      return(
-        new RaisedButton(
-          child: Text("Sign in with Google"),
-          onPressed: (){
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
-                builder: (context){
-                  return MyHomePage(title: "Clubhub");
-                }
-              )
-            );
-          },
+    switch (authType) {
+      case Authentication_type.GoogleLogin: {
+        return(
+          new RaisedButton(
+            child: Text("Sign in with Google"),
+            onPressed: (){
+              signInWithGoogle(campusID).then((u){
+                if(u != false){ // signInWithGoogle returned a valid user
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context){
+                        return MyHomePage(title: "Clubhub", user: u);
+                      }
+                    )
+                  );
+                }// end if
+                else{ // signInWithGoogle failed
+                
+                } // end else
+              }); // end .then()
+            }, // end onPressed
           )
-      );
-    }// end uif
-    else{
-      return(Text("No campus Login Widget Found"));
-    }
-  }
+        );// return
+      }
+
+      default:{
+        return(Text("No campus Login Widget Found"));
+      } // end default
+    } // end Switch
+  } // end build
 }
+

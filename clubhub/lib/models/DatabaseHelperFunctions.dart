@@ -15,13 +15,6 @@ import 'package:clubhub/models/Event.dart';
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
-
-
-import 'dart:convert';
-import 'package:csv/csv.dart';
-import 'dart:io';
-  
-
 import 'dart:math';
 
 
@@ -32,17 +25,18 @@ import 'dart:math';
 /// 
 Future<String> doesDocumentExist(String collection, String key, String value) async {
   final QuerySnapshot result = await Firestore.instance
-  .collection(collection)
-  .where(key, isEqualTo: value)
-  .limit(1)
-  .getDocuments();
-  if (result.documents.length != 0){
-    return result.documents[0].documentID;
-  }
-  else{
-    return "";
-  }
+    .collection(collection)
+    .where(key, isEqualTo: value)
+    .limit(1)
+    .getDocuments();
+    if (result.documents.length != 0){
+      return result.documents[0].documentID;
+    }
+    else{
+      return "";
+    }
 }
+
 
 /// Creates a Database object of [desiredType] given a DocumentSnapshot, [ds].
 /// This is used to translate from database documents to dart objects.
@@ -72,6 +66,7 @@ DatabaseObject createDatabaseObjectFromReference(DatabaseType desiredType, Docum
   }
 }
 
+/// Retrieves all the campus' from the DB and returns them as a list.
 Future<List<Campus>> retrieveAllCampus() async{
   List<Campus> campusList = [];
   final QuerySnapshot result = await Firestore.instance
@@ -107,32 +102,27 @@ Future<List<Club>> retrieveAllClubs() async{
 
 
 /* Event Helper functions */
+
+/// Given a [clubID], returns all a list of events associated with that
+/// [clubID] in the database. 
 Future<List<Event>> retrieveEventsForClub(String clubID) async {
   List<Event> eventList = [];
-
-  /*final QuerySnapshot result = await Firestore.instance
-  .collection("event")
-  .where("clubID", isEqualTo:clubID)
-  .getDocuments();
-*/
 
      final QuerySnapshot result = await Firestore.instance
     .collection("event")
     .where("clubID", isEqualTo: clubID)
     .getDocuments();
 
-
     for(var ds in result.documents){
       eventList.add(createDatabaseObjectFromReference(DatabaseType.Event, ds));
     }
  
-
-
   return eventList;
 }
 
+/// Retireves all events in the databse and returns as a list.
+/// This will be changed, currently used for testing
 Future<List<Event>> retrieveAllEvents() async{
-  //createFakeEvent();
   List<String> cludID = [];
   List<Event> events = [];
   final QuerySnapshot result = await Firestore.instance
@@ -152,6 +142,7 @@ Future<List<Event>> retrieveAllEvents() async{
   return events;
 }
 
+/// Retrieves all the ID's associated with clubs
 Future<List<String>> retrieveAllClubIDs() async {
   List<String> clubID = [];
   final QuerySnapshot result = await Firestore.instance
@@ -175,85 +166,3 @@ Future<List<String>> retrieveAllClubIDs() async {
     e.saveToDatabase();
   }
 
-  Future<void> loadInClubs(path) async {
-    new File(path)
-    .openRead()
-    .transform(utf8.decoder)
-    .transform(new LineSplitter())
-    .forEach((l) => print('line: $l'));
-  }
-
-/*
-  void _addChicoDB() async{
-    // Check if Chico already exists
-    final docDoesExist = await doesDocumentExist("campus", "name", "CSU Chico");
-    if(docDoesExist != ""){
-      debugPrint("CSU Chico already exists, the ID is: " + docDoesExist);
-    }
-    else{
-      var x = new Campus("campus", "CSU Chico", Authentication_type.GoogleLogin);
-      bool success = await x.saveToDatabase();
-      if(success){
-        debugPrint("document created");
-      }
-    }
-  }
-
-    void _addFakeClubDB(String name, String desc) async{
-    // grab chicos ID
-    String schoolID = await doesDocumentExist("campus", "name", "CSU Chico");
-    // Check if Club already exists
-    final docDoesExist = await doesDocumentExist("club", "name", name);
-    if(docDoesExist != ""){
-      debugPrint("Fake club already exists, the ID is: " + docDoesExist);
-    }
-    else{
-      var x = new Club("club", name, desc, false, schoolID);
-      bool success = await x.saveToDatabase();
-      if(success){
-        debugPrint("document created");
-      }
-    }
-    debugPrint("Heres a list of the clubs");
-    // Check all documents
-    List<Club> clubs = await retrieveAllClubs();
-    for(var item in clubs){
-      debugPrint(item.toJson().toString());
-    }
-    debugPrint("End list!");
-
-  }
-
-  void _testCreateObject() async{
-    final QuerySnapshot result = await Firestore.instance
-    .collection("campus")
-    .where("name", isEqualTo: "CSU Chico")
-    .limit(1)
-    .getDocuments();
-    DocumentSnapshot x = result.documents[0];
-
-    Campus y = createDatabaseObjectFromReference(DatabaseType.Campus,x);
-    if(y == null){
-      debugPrint("null");
-    }else{
-      debugPrint(y.toJson().toString());
-    }
-
-  }
-  void _testClubCreate() async{
-    final QuerySnapshot result = await Firestore.instance
-    .collection("club")
-    .where("name", isEqualTo: "Fake club")
-    .limit(1)
-    .getDocuments();
-    DocumentSnapshot x = result.documents[0];
-
-    Club y = createDatabaseObjectFromReference(DatabaseType.Club,x);
-    if(y == null){
-      debugPrint("null");
-    }else{
-      debugPrint(y.toJson().toString());
-    }
-
-  }
-  */

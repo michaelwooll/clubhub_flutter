@@ -11,7 +11,8 @@ import 'package:enum_to_string/enum_to_string.dart';
 enum DatabaseType{
   Campus,
   Club,
-  Event
+  Event,
+  User
 }
 
 abstract class DatabaseObject{
@@ -38,16 +39,34 @@ abstract class DatabaseObject{
   }
 
   /// Uses the objects overrided [toJson()] function to add a document to the [_collection]
-  Future<bool> saveToDatabase() async{
-    try{
-      Map<String,dynamic> json = toJson(); 
-      json['type'] = EnumToString.parse(getType()); // Add the objects type to the json
-      DocumentReference doc = await Firestore.instance.collection(_collection).add(json);
-      updateCrossReferenceTable(doc.documentID);
-    }catch(e){
-      debugPrint("Error in saveToDatabase: " + e);
-      return false;
-    }
-    return true;
+  /// Saved with [docID] if it is specified (this can be used to update an existing doc), else Firebase creates a unique ID for the document.
+  Future<bool> saveToDatabase({String docID = ""}) async{
+    if(docID == ""){
+      try{
+        Map<String,dynamic> json = toJson(); 
+        json['type'] = EnumToString.parse(getType()); // Add the objects type to the json
+        DocumentReference doc = await Firestore.instance.collection(_collection).add(json);
+        updateCrossReferenceTable(doc.documentID);
+        }
+        catch(e){
+          debugPrint("Error in saveToDatabase: " + e);
+          return false;
+        }
+      return true;
+    } // end if
+    else{
+      try{
+        Map<String,dynamic> json = toJson(); 
+        json['type'] = EnumToString.parse(getType()); // Add the objects type to the json
+        await Firestore.instance.collection(_collection).document(docID).setData(json);
+        updateCrossReferenceTable(docID);
+      }
+      catch(e){
+        debugPrint("Error in saveToDatabase: " + e);
+        return false;
+      }
+      return true;
+    } // end else
   }
+
 }
