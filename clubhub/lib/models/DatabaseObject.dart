@@ -12,7 +12,8 @@ enum DatabaseType{
   Campus,
   Club,
   Event,
-  User
+  User,
+  XREF
 }
 
 abstract class DatabaseObject{
@@ -68,5 +69,4 @@ abstract class DatabaseObject{
       return true;
     } // end else
   }
-
 }

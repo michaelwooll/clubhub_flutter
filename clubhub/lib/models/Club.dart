@@ -15,6 +15,7 @@ class Club extends DatabaseObject{
   bool _exclusive;
   String _campusID;
   String _imgURL;
+  String _clubID;
   // photo
   // schedule
   // userList
@@ -29,6 +30,7 @@ class Club extends DatabaseObject{
     _exclusive = ds ["exclusive"];
     _campusID = ds["campusID"];
     _imgURL = ds["img_url"];
+    _clubID = ds.documentID;
   }
 
   String getName() => _name;
@@ -50,11 +52,12 @@ class Club extends DatabaseObject{
 
   bool isExclusive() => _exclusive;
 
+  String getClubID() => _clubID;
+
   Map<String, dynamic> toJson () => {
     'name': _name,
     'description' : _description,
     'exclusive' : _exclusive,
     'campusID' : _campusID
   };
-
 }

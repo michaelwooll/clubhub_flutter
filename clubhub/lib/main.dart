@@ -4,12 +4,11 @@
 /// [Description]: Main file that contains the app
 /// 
 
-import 'package:clubhub/LogInPage.dart';
+import 'package:clubhub/views/logInPage.dart';
 import 'package:flutter/material.dart';
 import 'package:clubhub/widgets/ClubWidgets.dart';
 import 'package:clubhub/widgets/EventWidgets.dart';
 import 'package:clubhub/auth.dart';
-import 'package:clubhub/models/User.dart';
 
 void main() => runApp(MyApp());
 
@@ -28,9 +27,8 @@ class MyApp extends StatelessWidget {
 
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title, this.user}) : super(key: key);
+  MyHomePage({Key key, this.title}) : super(key: key);
   final String title;
-  final User user;
 
   @override
   _MyHomePageState createState() => _MyHomePageState();
@@ -72,7 +70,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title + ". Welcome " + widget.user.getFullName() +"!"),
+        title: Text(widget.title + ". Welcome " + UserInstance().getUser().getFullName()),
       ),
       body: Center(
         child: getWidgetOption(_pageIndex)

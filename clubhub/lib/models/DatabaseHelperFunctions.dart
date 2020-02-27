@@ -4,10 +4,10 @@
 /// [Description]: This holds functions that interact with the Firebase database, but are not related to a specific model.
 
 
+import 'package:clubhub/auth.dart';
 /*************** TODO *******************
  * Create getter functions for Club model
  */
-
 import 'package:clubhub/models/DatabaseObject.dart';
 import 'package:clubhub/models/Campus.dart';
 import 'package:clubhub/models/Club.dart';
@@ -82,16 +82,13 @@ Future<List<Campus>> retrieveAllCampus() async{
 
 /*  TODO FIX! 
 * Add description!
-* Currently uses a tempID to query
-* Add a global Campus class when user is signed in
 */
-Future<List<Club>> retrieveAllClubs() async{
+Future<List<Club>> retrieveAllClubs(String campusID) async{
   List<Club> clubList = [];
-  String tempID = "MzMsjEsaAIBTeWbcCsio";
   final QuerySnapshot result = await Firestore.instance
   .collection("club")
   .orderBy("name")
-  .where("campusID", isEqualTo: tempID)
+  .where("campusID", isEqualTo: campusID)
   .getDocuments();
   
   for(var ds in result.documents){
@@ -166,3 +163,48 @@ Future<List<String>> retrieveAllClubIDs() async {
     e.saveToDatabase();
   }
 
+
+  Future<List<Club>> getClubsFollowed() async{
+    String uid = UserInstance().getUser().getID();
+    List<Club> clubs = [];
+    QuerySnapshot result = await Firestore.instance
+    .collection("follows")
+    .where("user", isEqualTo: uid)
+    .getDocuments();
+    for(var ds in result.documents){
+      Club c = await getClubFromID(ds.data["club"]);
+      clubs.add(c);
+    }
+    return clubs;
+  }
+
+Future<Club> getClubFromID(String clubID) async{
+  //Club ret;
+  DocumentSnapshot res = await Firestore.instance
+  .collection("club")
+  .document(clubID)
+  .get();
+Firestore.instance.collection("test").snapshots();
+
+  return Club.fromDocumentSnapshot(res);
+}
+
+/*
+Stream<QuerySnapshot> getClubStream(int filterIndex, String campusID){
+  switch (filterIndex) {
+    case 0:{
+      return Firestore.instance.collection("clubs").where("campusID", isEqualTo: campusID).snapshots();
+    }
+    case 1:{
+      String uid = UserInstance().getUser().getID();
+      QuerySnapshot result = await Firestore.instance
+      .collection("follows")
+      .where("user", isEqualTo: uid)
+      .getDocuments();
+      return Firestore.instance.collection("follows").where(
+    }
+    default:{
+      return null;
+    }
+  }
+}*/

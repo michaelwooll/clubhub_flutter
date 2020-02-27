@@ -117,10 +117,11 @@ class LoginWidget extends StatelessWidget {
             onPressed: (){
               signInWithGoogle(campusID).then((u){
                 if(u != false){ // signInWithGoogle returned a valid user
+                  UserInstance(user:u);
                   Navigator.of(context).pushReplacement(
                     MaterialPageRoute(
                       builder: (context){
-                        return MyHomePage(title: "Clubhub", user: u);
+                        return MyHomePage(title: "Clubhub");
                       }
                     )
                   );

@@ -13,6 +13,7 @@ import 'package:clubhub/models/User.dart';
 
 final FirebaseAuth _auth = FirebaseAuth.instance;
 final GoogleSignIn googleSignIn = GoogleSignIn();
+
 /// Used to sign in with google for a specific campus with [campusID]
 /// https://stackoverflow.com/questions/59790087/flutter-firebase-google-sign-in-not-working-stops-after-account-selection was used as reference
 Future<dynamic> signInWithGoogle(String campusID) async {
@@ -55,7 +56,7 @@ Future<User> authUserWithDB(FirebaseUser u, String campusID) async{
     }
     return User.fromDocumentSnapshot(result);
   }else{ // User does not exist, create the user.
-    User newUser = new User("users", u.displayName,u.email, DateTime.now(), campusID);
+    User newUser = new User("users", u.displayName,u.email, DateTime.now(), campusID, u.uid);
     newUser.saveToDatabase(docID: u.uid);
     return newUser;
   }
@@ -64,4 +65,22 @@ Future<User> authUserWithDB(FirebaseUser u, String campusID) async{
 /// Signs out of google
 Future<void> signOutGoogle() async{
   await googleSignIn.signOut();
+}
+
+
+/// Singleton class to pass around user data
+/// TODO: Quick and dirty implementation use inherited widget instead
+class UserInstance {
+  static final UserInstance _singleton = UserInstance._internal();
+  User data;
+
+  factory UserInstance({User user}) {
+    if(_singleton.data == null && user != null){
+      _singleton.data = user;
+    }
+    return _singleton;
+  }
+  User getUser() => data;
+
+  UserInstance._internal();
 }

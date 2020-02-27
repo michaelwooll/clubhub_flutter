@@ -14,14 +14,16 @@ class User extends DatabaseObject{
   DateTime _created;
   String _campusID;
   String _imgURL; // Default to null
+  String _id;
 
-  User(String collection, this._name, this._email, this._created, this._campusID):super(collection, DatabaseType.User);
+  User(String collection, this._name, this._email, this._created, this._campusID, this._id):super(collection, DatabaseType.User);
   User.fromDocumentSnapshot(DocumentSnapshot ds):super("user", DatabaseType.User){
     _name = ds["name"];
     _email = ds["email"];
     _created = ds["created"].toDate();
     _campusID = ds["campusID"];
     _imgURL = ds["imgURL"];
+    _id = ds.documentID;
   }
 
 
@@ -30,6 +32,9 @@ class User extends DatabaseObject{
   DateTime getCreated() => _created;
   String getCampusID() => _campusID;
   String getImgURL() => _imgURL;
+  String getID() => _id;
+
+
 
   Map<String, dynamic> toJson () => {
     'name': _name,
