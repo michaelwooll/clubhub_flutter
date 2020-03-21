@@ -1,3 +1,4 @@
+
 /// [File]: main.dart
 /// [Author]: Michael Wooll
 /// 
@@ -62,7 +63,6 @@ class _MyHomePageState extends State<MyHomePage> {
         signOutGoogle();
       },
     ),
-    /*Text("calendar"),*/
     ClubList(),
   ];
 
@@ -73,7 +73,7 @@ class _MyHomePageState extends State<MyHomePage> {
         title: Text(widget.title + ". Welcome " + UserInstance().getUser().getFullName()),
       ),
       body: Center(
-        child: getWidgetOption(_pageIndex)
+        child: _widgetOptions[_pageIndex]
       ),
       bottomNavigationBar: 
       BottomNavigationBar(
@@ -81,8 +81,8 @@ class _MyHomePageState extends State<MyHomePage> {
         onTap: _onItemTapped,
         items: [
           BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              title: Text('Home'),
+              icon: Icon(Icons.format_list_bulleted ),
+              title: Text('Feed'),
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.calendar_today),

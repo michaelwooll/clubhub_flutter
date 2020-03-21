@@ -11,6 +11,8 @@ import 'package:flutter/rendering.dart';
 import 'package:clubhub/auth.dart';
 import 'package:clubhub/views/clubProfile.dart';
 
+
+
 /// [Stateless widget] that displays a clubs information in a [Card] format
 ///Used https://api.flutter.dev/flutter/material/Card-class.html for reference
 class ClubCard extends StatelessWidget {
@@ -107,13 +109,33 @@ class _ClubListState extends State<ClubList>{
     }
     return null;
   }
-
   
+  void _filterCallBack(String value){
+    setState(() {
+      _clubs = filterClubSearch(_clubMaster[_filterIndex], value);    
+    });
+  }
+
+
+  List<Club> filterClubSearch(List<Club> clubList, String filter){
+    if(filter.isEmpty){
+      return clubList;
+    }
+    List<Club> ret = [];
+    for(var club in clubList){
+      if(club.getName().toLowerCase().contains(filter.toLowerCase()) || club.getDescription().toLowerCase().contains(filter.toLowerCase())){
+        ret.add(club);
+      }
+    }
+    return ret;
+  }
+
   @override
 
   Widget build(BuildContext context){
     //
     List<Widget> children = [];
+    children.add(SearchBar(callback: _filterCallBack));
     ButtonBar buttons = new ButtonBar(children: 
       <Widget>[
         MaterialButton(
@@ -128,8 +150,8 @@ class _ClubListState extends State<ClubList>{
                   _filterIndex = 0;
                   _clubMaster[_filterIndex] = value;
                   _clubs = _clubMaster[_filterIndex];
-
-                  //_clubs = value;
+                  //_clubs = filterClubSearch(_clubMaster[_filterIndex], _searchFilter);
+                 // _clubs = value;
                 }
               ); 
             });},
@@ -137,11 +159,15 @@ class _ClubListState extends State<ClubList>{
         MaterialButton(
           child: Text("Followed"),
           onPressed: (){
+            setState(() {
+                _clubs = null;
+            });
             getClubsFollowed().then((value){
               setState(() {
                  _filterIndex = 1;
                  _clubMaster[_filterIndex] = value;
                  _clubs = _clubMaster[_filterIndex];
+                 //_clubs = filterClubSearch(_clubMaster[_filterIndex], _searchFilter);
               });
             });},
         )
@@ -172,6 +198,7 @@ class _ClubListState extends State<ClubList>{
     } // end if
     // Else we have data, build a list of ClubCard's
     else{
+
       for(var c in _clubs){
         children.add(ClubCard(club: c, callBack: () =>_handleRefresh(_filterIndex)));
       } // end for
@@ -186,4 +213,32 @@ class _ClubListState extends State<ClubList>{
       onRefresh: () =>_handleRefresh(_filterIndex),
     );
   }// end build
+}
+
+class SearchBar extends StatefulWidget {
+  const SearchBar({Key key, this.callback}):super(key:key);
+  final Function callback;
+  @override
+  _SearchBarState createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<SearchBar> {
+  final TextEditingController _controller =  new TextEditingController();
+  _SearchBarState(){
+    _controller.addListener((){
+      widget.callback(_controller.text);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child:  TextField(
+        controller: _controller,
+        decoration: InputDecoration(
+          prefixIcon: Icon(Icons.search)
+        ),
+      )
+    );
+  }
 }

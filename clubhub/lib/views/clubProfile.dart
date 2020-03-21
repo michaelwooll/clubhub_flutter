@@ -29,7 +29,7 @@ class ClubProfile extends StatelessWidget {
 }
 
 class FollowButton extends StatefulWidget {
-  String clubID;
+  final String clubID;
   final Function callBack;
   FollowButton({this.clubID, this.callBack});
   @override
@@ -54,7 +54,6 @@ class _FollowButtonState extends State<FollowButton> {
     if(isFollowed == null){
       children.add(
         RaisedButton(
-          child: Text("Loading"),
           onPressed: (){}
         )
       );

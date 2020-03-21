@@ -139,6 +139,7 @@ Future<List<Event>> retrieveAllEvents() async{
   return events;
 }
 
+
 /// Retrieves all the ID's associated with clubs
 Future<List<String>> retrieveAllClubIDs() async {
   List<String> clubID = [];
@@ -178,6 +179,20 @@ Future<List<String>> retrieveAllClubIDs() async {
     return clubs;
   }
 
+  Future<List<String>> getClubIDsFollowed() async{
+    String uid = UserInstance().getUser().getID();
+    List<String> ids = [];
+    QuerySnapshot result = await Firestore.instance
+    .collection("follows")
+    .where("user", isEqualTo: uid)
+    .getDocuments();
+    for(var ds in result.documents){
+      String id = ds["club"];
+      ids.add(id);
+    }
+    return ids;
+  }
+
 Future<Club> getClubFromID(String clubID) async{
   //Club ret;
   DocumentSnapshot res = await Firestore.instance
@@ -188,23 +203,3 @@ Firestore.instance.collection("test").snapshots();
 
   return Club.fromDocumentSnapshot(res);
 }
-
-/*
-Stream<QuerySnapshot> getClubStream(int filterIndex, String campusID){
-  switch (filterIndex) {
-    case 0:{
-      return Firestore.instance.collection("clubs").where("campusID", isEqualTo: campusID).snapshots();
-    }
-    case 1:{
-      String uid = UserInstance().getUser().getID();
-      QuerySnapshot result = await Firestore.instance
-      .collection("follows")
-      .where("user", isEqualTo: uid)
-      .getDocuments();
-      return Firestore.instance.collection("follows").where(
-    }
-    default:{
-      return null;
-    }
-  }
-}*/

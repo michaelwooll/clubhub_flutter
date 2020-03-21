@@ -9,6 +9,7 @@ import 'package:clubhub/models/DatabaseHelperFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 
+
 /// [Stateless widget] that displays an events information in a [Card] format
 ///Used https://api.flutter.dev/flutter/material/Card-class.html for reference
 class EventCard extends StatelessWidget {
@@ -46,20 +47,30 @@ class EventList extends StatefulWidget{
 
 class _EventListState extends State<EventList>{
   List<Event> _events = []; // State of the event list  
+  bool _isLoaded = false;
   @override
   void initState() {
     super.initState();
-    //createFakeEvent();
+    _handleEventListQuery();
     // Grab events club by club
-    retrieveAllClubIDs().then((value){
+    /*getClubIDsFollowed().then((value){
       for(var id in value){
         retrieveEventsForClub(id).then((events){
-          setState(() {
-            _events += events;
-          });
+          // No events found
+          if(events.length == 0){
+            setState((){
+              _isLoaded = true;
+            });
+          }// end if
+          else{
+            setState(() {
+              _events += events;
+              _isLoaded = false;
+            });
+          } // end else
         });
       }
-    });
+    });*/
   }
 
 /// This refresh handler will retrieve the most up to date eventlist
@@ -67,27 +78,40 @@ class _EventListState extends State<EventList>{
   Future<Null> _handleRefresh() async{
     setState(() {
       _events = [];
+      _isLoaded = false;
     });
-
-    retrieveAllClubIDs().then((value){
-      for(var id in value){
-        retrieveEventsForClub(id).then((events){
-          setState(() {
-            _events += events;
-          });
-        });
-      }
-    });
-
+  
+    _handleEventListQuery();
     return null;
   }
   
+  Future<Null> _handleEventListQuery() async{
+    getClubIDsFollowed().then((value){
+      for(var id in value){
+        retrieveEventsForClub(id).then((events){
+          // No events found
+          if(events.length == 0){
+            setState((){
+              _isLoaded = true;
+            });
+          }// end if
+          else{
+            setState(() {
+              _events += events;
+              _isLoaded = false;
+            });
+          } // end else
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context){
     // 
     List<Widget> children = []; 
     // If the list is currenty empty we are fetching from DB, Show load circle.
-    if(_events.isEmpty){
+    if(_events.isEmpty && !_isLoaded){
       children = <Widget>[
             const Padding(
               padding: EdgeInsets.only(top: 100),
@@ -107,6 +131,21 @@ class _EventListState extends State<EventList>{
             )
       ];
     } // end if
+    // No events were found and the query came back with no results
+    else if(_events.isEmpty && _isLoaded){
+          children = <Widget>[
+            const Padding(
+              padding: EdgeInsets.only(top: 100),
+            ),
+            Center(
+              child: SizedBox(
+              child: Text("No results"),
+              width: 100,
+              height: 100,
+            )
+            ),
+      ];
+    }
     // Else we have data, build a list of EventCard's
     else{
       for(var e in _events){
