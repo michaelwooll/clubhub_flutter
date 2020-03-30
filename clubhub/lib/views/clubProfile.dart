@@ -3,6 +3,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:clubhub/models/Club.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:clubhub/widgets/EventWidgets.dart';
+
 
 
 class ClubProfile extends StatelessWidget {
@@ -19,6 +21,17 @@ class ClubProfile extends StatelessWidget {
           children: [
             Image.network(club.getImgURL()),
             FollowButton(clubID: club.getClubID(), callBack: callBack),
+            RaisedButton(child:Text("Create event:"),
+              onPressed: (){
+                showDialog(context: context,
+                  builder: (BuildContext context){
+                    return AlertDialog(
+                      content: EventForm(club.getClubID())
+                    );
+                  }
+                );
+              },
+            ),
             Text(club.getName()),
             Text(club.getDescription())
           ]
@@ -136,3 +149,4 @@ Future<bool> followClub(String clubID) async{
     .getDocuments();
     return doc.documents.isNotEmpty;
   }
+

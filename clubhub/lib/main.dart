@@ -58,9 +58,9 @@ class _MyHomePageState extends State<MyHomePage> {
   static List<Widget> _widgetOptions = <Widget>[
     EventList(),
     RaisedButton(
-      child: Text("Sign out "),
+      child: Text("nothing"),
       onPressed: (){
-        signOutGoogle();
+        
       },
     ),
     ClubList(),

@@ -155,12 +155,8 @@ Future<List<String>> retrieveAllClubIDs() async {
 
 }
 
- Future<void> createFakeEvent() async{
-    List<String> idList = await retrieveAllClubIDs();
-    Random random = new Random();
-    int index = random.nextInt(idList.length-1);
-    String eName = "Event" + random.nextInt(500).toString();
-    Event e = new Event("event",eName,"This is a description about the club event! Wow sounds like fun!",idList[index],DateTime.now());
+ Future<void> createEvent(String title, String desc,String clubID, DateTime date) async{
+    Event e = new Event("event",title,desc,clubID,date);
     e.saveToDatabase();
   }
 

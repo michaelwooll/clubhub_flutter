@@ -13,16 +13,20 @@ class Event extends DatabaseObject{
   String _title;
   String _description;
   String _clubID; // ID of Club inside database
+  DateTime _date;
   DateTime _postTime; // Date and time when posted
   // photo
 
-  Event(String collection , this._title, this._description, this._clubID, this._postTime):super(collection, DatabaseType.Event);
+  Event(String collection , this._title, this._description, this._clubID, this._date):super(collection, DatabaseType.Event){
+    _postTime = DateTime.now();
+  }
   Event.fromDocumentSnapshot(DocumentSnapshot ds):super("event", DatabaseType.Event){
     /* Do stuff */
     _title = ds["title"];
     _description = ds["description"];
     _clubID= ds ["clubID"];
     _postTime = DateTime.parse(ds["postTime"]);
+    _date = ds["date"].toDate();
   }
 
   String getTitle() => _title;
@@ -34,7 +38,8 @@ class Event extends DatabaseObject{
     'title': _title,
     'description' : _description,
     'clubID' : _clubID,
-    'postTime' : _postTime.toString()
+    'postTime' : _postTime.toString(),
+    'date': _date
   };
 
 }

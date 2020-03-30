@@ -8,6 +8,10 @@ import 'package:clubhub/models/Event.dart';
 import 'package:clubhub/models/DatabaseHelperFunctions.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:clubhub/models/DatabaseHelperFunctions.dart';
+
 
 
 /// [Stateless widget] that displays an events information in a [Card] format
@@ -162,4 +166,127 @@ class _EventListState extends State<EventList>{
       onRefresh: _handleRefresh,
     );
   }// end build
+}
+
+
+
+class EventForm extends StatefulWidget {
+  final id;
+  const EventForm(this.id,{Key key}):super(key:key);
+
+  @override
+  _EventFormState createState() => _EventFormState();
+}
+
+class _EventFormState extends State<EventForm> {
+  final dateController = TextEditingController(); 
+  final timeController = TextEditingController(); 
+  final titleController = TextEditingController();
+  final descController = TextEditingController();
+
+  DateTime date;
+  DateTime time;
+  @override
+  Widget build(BuildContext context) {
+      return Form(
+        child: Column(
+          children: <Widget>[
+            Text("Create an Event!"),
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: "Title"
+              ),
+              controller: titleController,
+            ),
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: "Description"
+              ),
+              controller: descController,
+              keyboardType: TextInputType.multiline,
+              minLines: 1,//Normal textInputField will be displayed
+              maxLines: 5,// when user presses enter it will adapt to it
+            ),
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: "Date"
+              ),
+              controller: dateController,
+              onTap: (){
+                // Below line stops keyboard from appearing
+                FocusScope.of(context).requestFocus(new FocusNode());
+                // Show date picker
+                DatePicker.showDatePicker(context,
+                  minTime: DateTime.now(),
+                  onConfirm: (d) {
+                    date = d;
+                    dateController.text = DateFormat.yMMMd().format(d);
+                  }
+                );
+              
+            },),
+            TextFormField(
+              decoration: const InputDecoration(
+                labelText: "Time"
+              ),
+              controller: timeController,
+              onTap: (){
+                // Below line stops keyboard from appearing
+                FocusScope.of(context).requestFocus(new FocusNode()); 
+                // Show time picker
+                DatePicker.showTime12hPicker(context,
+                  onConfirm: (t){
+                    time = t;
+                    timeController.text = DateFormat.jm().format(t);
+                  }
+                );
+              }
+            ),
+            RaisedButton(
+              child: Text("Submit!"),
+              onPressed: (){
+                String formatString = combineDateAndTime(date, time);
+                DateTime d = DateTime.parse(formatString);
+                createEvent(titleController.text, descController.text,widget.id,d);
+              },
+            )
+          ]
+        )
+      ); 
+  }
+}
+
+
+String combineDateAndTime(DateTime date, DateTime time){
+
+  String year,month,day,hour,minute,result;
+  year = date.year.toString();
+  if(date.month < 10){
+    month = "0" + date.month.toString();
+  }else{
+    month = date.month.toString();
+  }
+
+  if(date.day < 10){
+    day = "0" + date.day.toString();
+  }
+  else{
+    day = date.day.toString();
+  }
+  if(time.hour < 10){
+    hour = "0" + time.hour.toString();
+  }
+  else{
+    hour = time.hour.toString();
+  }
+
+  if(time.minute < 10){
+    minute = "0" + time.minute.toString();
+  }
+  else{
+    minute = time.minute.toString();
+
+  }
+  result = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00";
+  return (year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00");
 }
