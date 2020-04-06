@@ -24,6 +24,8 @@ class Campus extends DatabaseObject{
     _name = ds["name"];
     _auth = EnumToString.fromString(Authentication_type.values, ds["auth"]);
     _id = ds.documentID;
+    setDocID(ds.documentID);
+
   }
 
   String getName() => _name;

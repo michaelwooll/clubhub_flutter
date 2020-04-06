@@ -31,6 +31,8 @@ class Club extends DatabaseObject{
     _campusID = ds["campusID"];
     _imgURL = ds["img_url"];
     _clubID = ds.documentID;
+    setDocID(ds.documentID);
+
   }
 
   String getName() => _name;

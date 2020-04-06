@@ -13,12 +13,14 @@ enum DatabaseType{
   Club,
   Event,
   User,
-  XREF
+  XREF,
+  Comment
 }
 
 abstract class DatabaseObject{
   String _collection; // collection inside firebase DB
   DatabaseType _type; /// Stores the [type] of database object. (Campus, Club, etc).
+  String _documentID;
   DatabaseObject(this._collection, this._type);
 
   /// Getter to return [_collection] variable.
@@ -41,19 +43,21 @@ abstract class DatabaseObject{
 
   /// Uses the objects overrided [toJson()] function to add a document to the [_collection]
   /// Saved with [docID] if it is specified (this can be used to update an existing doc), else Firebase creates a unique ID for the document.
-  Future<bool> saveToDatabase({String docID = ""}) async{
+  Future<String> saveToDatabase({String docID = ""}) async{
     if(docID == ""){
+      DocumentReference doc;
       try{
         Map<String,dynamic> json = toJson(); 
         json['type'] = EnumToString.parse(getType()); // Add the objects type to the json
-        DocumentReference doc = await Firestore.instance.collection(_collection).add(json);
+        doc = await Firestore.instance.collection(_collection).add(json);
+        _documentID = doc.documentID;
         updateCrossReferenceTable(doc.documentID);
         }
         catch(e){
           debugPrint("Error in saveToDatabase: " + e);
-          return false;
+          return null;
         }
-      return true;
+      return doc.documentID;
     } // end if
     else{
       try{
@@ -64,9 +68,14 @@ abstract class DatabaseObject{
       }
       catch(e){
         debugPrint("Error in saveToDatabase: " + e);
-        return false;
+        return "";
       }
-      return true;
+      return docID;
     } // end else
+  }
+
+  String getDocID() => _documentID;
+  void setDocID(String id){
+    _documentID = id;
   }
 }

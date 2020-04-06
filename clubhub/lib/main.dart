@@ -6,6 +6,7 @@
 /// 
 
 import 'package:clubhub/views/logInPage.dart';
+import 'package:clubhub/widgets/CommentWidgets.dart';
 import 'package:flutter/material.dart';
 import 'package:clubhub/widgets/ClubWidgets.dart';
 import 'package:clubhub/widgets/EventWidgets.dart';
@@ -57,12 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   static List<Widget> _widgetOptions = <Widget>[
     EventList(),
-    RaisedButton(
-      child: Text("nothing"),
-      onPressed: (){
-        
-      },
-    ),
+    CommentList("123"),
     ClubList(),
   ];
 

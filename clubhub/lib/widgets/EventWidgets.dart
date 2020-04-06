@@ -10,7 +10,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:clubhub/models/DatabaseHelperFunctions.dart';
+import 'package:clubhub/models/Club.dart';
+import 'package:clubhub/widgets/CommentWidgets.dart';
+
+
+import 'CommentWidgets.dart';
 
 
 
@@ -18,7 +22,8 @@ import 'package:clubhub/models/DatabaseHelperFunctions.dart';
 ///Used https://api.flutter.dev/flutter/material/Card-class.html for reference
 class EventCard extends StatelessWidget {
   final Event event; // Event object that will hold all the event data
-  const EventCard({Key key, this.event}): super(key:key); 
+  final Club club;
+  const EventCard({Key key, this.event, this.club}): super(key:key); 
 
   @override
   Widget build(BuildContext context){
@@ -27,11 +32,36 @@ class EventCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ListTile(
-              leading: Icon(Icons.note),
-              title: Text(event.getTitle()),
-              subtitle: Text(event.getDescription())
-            ) // ListTitle
+            ExpansionTile(
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage(club.getImgURL()),
+                minRadius: 25,
+                maxRadius: 30,
+              ),
+              title: Text(
+                club.getName(),
+                style: TextStyle(fontSize: 13, fontWeight: FontWeight.bold,color: Colors.blueGrey)
+                ),
+              subtitle: Text(
+                event.getTitle(),
+                style: TextStyle(fontSize: 18, color: Colors.black)
+              ),
+              trailing:  Column(
+                children: <Widget>[
+                  Text("Event",
+                    style: TextStyle(color: Colors.blue)
+                  ),
+                  Text(event.getDateString(),
+                    style: TextStyle(color: Colors.blueGrey)
+                  
+                  ),
+                  Text(event.getTimeString(),
+                    style: TextStyle(color: Colors.blueGrey)),
+                  
+                ]
+              ),
+              children: <Widget>[EventCardBody(event)]
+            )
           ], // End children widget
         ), // Column
       ), // Card
@@ -51,30 +81,12 @@ class EventList extends StatefulWidget{
 
 class _EventListState extends State<EventList>{
   List<Event> _events = []; // State of the event list  
+  Map<String, Club> _clubs = {};
   bool _isLoaded = false;
   @override
   void initState() {
     super.initState();
     _handleEventListQuery();
-    // Grab events club by club
-    /*getClubIDsFollowed().then((value){
-      for(var id in value){
-        retrieveEventsForClub(id).then((events){
-          // No events found
-          if(events.length == 0){
-            setState((){
-              _isLoaded = true;
-            });
-          }// end if
-          else{
-            setState(() {
-              _events += events;
-              _isLoaded = false;
-            });
-          } // end else
-        });
-      }
-    });*/
   }
 
 /// This refresh handler will retrieve the most up to date eventlist
@@ -91,6 +103,11 @@ class _EventListState extends State<EventList>{
   
   Future<Null> _handleEventListQuery() async{
     getClubIDsFollowed().then((value){
+      if(value.isEmpty){
+        setState(() {
+          _isLoaded = true;
+        });
+      }
       for(var id in value){
         retrieveEventsForClub(id).then((events){
           // No events found
@@ -100,10 +117,24 @@ class _EventListState extends State<EventList>{
             });
           }// end if
           else{
-            setState(() {
-              _events += events;
-              _isLoaded = false;
-            });
+            // Check if club is already in map
+            if(!_clubs.containsKey(id)){ // If it IS not in map
+              // Get club and place into map
+              getClubFromID(id).then((club){
+                setState(() {
+                  _events += events;
+                  _isLoaded = false;
+                  _clubs[id] = club;
+                });
+              });
+            }
+            else{
+              setState(() {
+                _events += events;
+                _isLoaded = false;
+              });
+            }
+
           } // end else
         });
       }
@@ -153,7 +184,7 @@ class _EventListState extends State<EventList>{
     // Else we have data, build a list of EventCard's
     else{
       for(var e in _events){
-        children.add(EventCard(event: e));
+        children.add(EventCard(event: e, club: _clubs[e.getClubID()]));
       } // end for
     }// end else
     
@@ -289,4 +320,42 @@ String combineDateAndTime(DateTime date, DateTime time){
   }
   result = year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00";
   return (year + "-" + month + "-" + day + " " + hour + ":" + minute + ":00");
+}
+
+
+class EventCardBody extends StatelessWidget {
+  final event;
+  EventCardBody(this.event, {Key key}):super(key:key);
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+        children: <Widget>[
+         /* SizedBox(
+            child: FlatButton(
+              child: Text("Add to calendar"),
+              onPressed:()=>{},
+              color: Colors.lightGreen,  
+              splashColor: Colors.greenAccent,
+            ),
+            width: 150,
+            height: 25,
+          ),*/
+        
+          Text(event.getDescription()),
+          GestureDetector(
+            child:  Text(
+              "See comments",
+              style: TextStyle(color: Colors.blue)
+            ),
+            onTap:(){ showDialog(
+              context: context,
+              builder: (BuildContext context){
+                return AlertDialog(content: CommentList(event.getDocID()));
+              }
+              );
+            }
+          )
+        ]
+      );
+  }
 }

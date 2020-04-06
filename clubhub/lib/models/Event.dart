@@ -6,6 +6,7 @@
 
 import 'package:clubhub/models/DatabaseObject.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 
 
 /// Contains information about an [Event] that is associated with a club
@@ -27,12 +28,22 @@ class Event extends DatabaseObject{
     _clubID= ds ["clubID"];
     _postTime = DateTime.parse(ds["postTime"]);
     _date = ds["date"].toDate();
+    setDocID(ds.documentID);
   }
 
   String getTitle() => _title;
   String getDescription() => _description;
   DateTime getDateTime() => _postTime;
   String getClubID() => _clubID;
+
+  String getDateString(){
+    return new DateFormat().add_yMMMd().format(_postTime);
+  }
+
+  String getTimeString(){
+    return new DateFormat().add_jm().format(_postTime);
+  }
+
 
   Map<String, dynamic> toJson () => {
     'title': _title,

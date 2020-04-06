@@ -56,7 +56,7 @@ Future<User> authUserWithDB(FirebaseUser u, String campusID) async{
     }
     return User.fromDocumentSnapshot(result);
   }else{ // User does not exist, create the user.
-    User newUser = new User("users", u.displayName,u.email, DateTime.now(), campusID, u.uid);
+    User newUser = new User("users", u.displayName,u.email, DateTime.now(), campusID,  u.photoUrl,u.uid);
     newUser.saveToDatabase(docID: u.uid);
     return newUser;
   }

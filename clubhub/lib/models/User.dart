@@ -16,7 +16,7 @@ class User extends DatabaseObject{
   String _imgURL; // Default to null
   String _id;
 
-  User(String collection, this._name, this._email, this._created, this._campusID, this._id):super(collection, DatabaseType.User);
+  User(String collection, this._name, this._email, this._created, this._campusID, this._imgURL, this._id):super(collection, DatabaseType.User);
   User.fromDocumentSnapshot(DocumentSnapshot ds):super("user", DatabaseType.User){
     _name = ds["name"];
     _email = ds["email"];

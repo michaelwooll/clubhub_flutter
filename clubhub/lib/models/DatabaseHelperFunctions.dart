@@ -12,6 +12,9 @@ import 'package:clubhub/models/DatabaseObject.dart';
 import 'package:clubhub/models/Campus.dart';
 import 'package:clubhub/models/Club.dart';
 import 'package:clubhub/models/Event.dart';
+import 'package:clubhub/models/Comment.dart';
+import 'package:clubhub/models/User.dart';
+
 import 'package:enum_to_string/enum_to_string.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/cupertino.dart';
@@ -58,6 +61,12 @@ DatabaseObject createDatabaseObjectFromReference(DatabaseType desiredType, Docum
     }
     case DatabaseType.Event: {
       return Event.fromDocumentSnapshot(ds);
+    }
+    case DatabaseType.Comment: {
+      return Comment.fromDocumentSnapshot(ds);
+    }
+    case DatabaseType.User: {
+      return User.fromDocumentSnapshot(ds);
     }
     default: {
       debugPrint("Desired type not found. Failed to create a database object from reference. Returning null");
@@ -198,4 +207,49 @@ Future<Club> getClubFromID(String clubID) async{
 Firestore.instance.collection("test").snapshots();
 
   return Club.fromDocumentSnapshot(res);
+}
+
+
+Future<List<Comment>> retrieveCommentsForEvent(String eventID) async{
+  List<Comment> comments = [];
+  try{
+    QuerySnapshot result = await Firestore.instance
+    .collection("XREF_EVENT_COMMENT")
+    .where("event", isEqualTo: eventID)
+    .getDocuments();
+    
+    for(var ds in result.documents){
+      DocumentSnapshot document = await Firestore.instance.
+      collection("comment").
+      document(ds["comment"])
+      .snapshots()
+      .first;
+      debugPrint(document["content"]);
+      Comment c = new Comment.fromDocumentSnapshot(document);
+      comments.add(c);
+    }
+    comments.sort((b,a){
+      int res = a.getLikes().compareTo(b.getLikes());
+      if(res == 0){
+        res = a.getPostTime().compareTo(b.getPostTime());
+      }
+      return res;
+      
+    });
+
+  }
+  catch(e){
+    debugPrint("Error retieving comments for event " + e.toString());
+  }
+  return comments;
+}
+
+Future<User> getUserByID(String id) async{
+  DocumentSnapshot res = await Firestore.instance
+  .collection("users")
+  .document(id)
+  .get();
+
+
+  return User.fromDocumentSnapshot(res);
 }
