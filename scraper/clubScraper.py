@@ -4,7 +4,7 @@ import time
 import csv
 import datetime
 
-NUM_CLICKS = 23
+NUM_CLICKS = 3
 
 start = datetime.datetime.now()
 time.sleep(2)

@@ -1,3 +1,4 @@
+import 'package:clubhub/auth.dart';
 /// [File]: EventWidget.dart
 /// [Author]: Michael Wooll
 /// 
@@ -6,6 +7,7 @@
 /// 
 import 'package:clubhub/models/Event.dart';
 import 'package:clubhub/models/DatabaseHelperFunctions.dart';
+import 'package:clubhub/views/eventPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_datetime_picker/flutter_datetime_picker.dart';
@@ -32,7 +34,7 @@ class EventCard extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            ExpansionTile(
+            ListTile(
               leading: CircleAvatar(
                 backgroundImage: NetworkImage(club.getImgURL()),
                 minRadius: 25,
@@ -57,10 +59,15 @@ class EventCard extends StatelessWidget {
                   ),
                   Text(event.getTimeString(),
                     style: TextStyle(color: Colors.blueGrey)),
-                  
                 ]
               ),
-              children: <Widget>[EventCardBody(event)]
+              onTap: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EventCardLarge(club: club,event: event, callBack: (){}
+                    )
+                    )
+                  ),
             )
           ], // End children widget
         ), // Column
@@ -121,16 +128,18 @@ class _EventListState extends State<EventList>{
             if(!_clubs.containsKey(id)){ // If it IS not in map
               // Get club and place into map
               getClubFromID(id).then((club){
+                _events += events;
+                _events.sort((b,a) => a.getDateTime().compareTo(b.getDateTime()));
                 setState(() {
-                  _events += events;
                   _isLoaded = false;
                   _clubs[id] = club;
                 });
               });
             }
             else{
+              _events += events;
+              _events.sort((b,a) => a.getDateTime().compareTo(b.getDateTime()));
               setState(() {
-                _events += events;
                 _isLoaded = false;
               });
             }
@@ -275,10 +284,15 @@ class _EventFormState extends State<EventForm> {
             ),
             RaisedButton(
               child: Text("Submit!"),
+               color: Colors.redAccent,
+              shape: RoundedRectangleBorder(
+             borderRadius: new BorderRadius.circular(20.0)
+           ),
               onPressed: (){
                 String formatString = combineDateAndTime(date, time);
                 DateTime d = DateTime.parse(formatString);
                 createEvent(titleController.text, descController.text,widget.id,d);
+                Navigator.pop(context);
               },
             )
           ]
@@ -330,16 +344,11 @@ class EventCardBody extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
         children: <Widget>[
-         /* SizedBox(
-            child: FlatButton(
-              child: Text("Add to calendar"),
-              onPressed:()=>{},
-              color: Colors.lightGreen,  
-              splashColor: Colors.greenAccent,
-            ),
-            width: 150,
+         SizedBox(
+            child: FollowEventButton(event: event),
+            width: 200,
             height: 25,
-          ),*/
+          ),
         
           Text(event.getDescription()),
           GestureDetector(
@@ -357,5 +366,76 @@ class EventCardBody extends StatelessWidget {
           )
         ]
       );
+  }
+}
+
+
+class FollowEventButton extends StatefulWidget {
+  final Event event;
+  final Function callBack;
+ // final Function callBack;
+  FollowEventButton({this.event, this.callBack});
+  @override
+  _FollowEventButton createState() => _FollowEventButton();
+}
+
+class _FollowEventButton extends State<FollowEventButton> {
+  bool isFollowed;
+  @override
+  void initState() {
+    super.initState();
+    userFollowsEvent(widget.event).then((value){
+      setState(() {
+        isFollowed = value;
+      });
+    });
+  }
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> children = [];
+    if(isFollowed == null){
+      children.add(
+        RaisedButton(
+          onPressed: (){}
+        )
+      );
+    }
+    else if(!isFollowed){
+      children.add(
+        FlatButton(
+          child: Text("Add to calendar!"),
+          color: Colors.lightGreen,  
+          splashColor: Colors.greenAccent,
+          onPressed: (){
+           followEvent(UserInstance().getUser().getID(),widget.event).then((value){
+             setState(() {
+               isFollowed = value;
+             });
+             widget.callBack();
+           });
+          }
+        )
+      );
+    }
+    else{
+      children.add(
+        FlatButton(
+          child: Text("Remove from calendar"),
+          color: Colors.red,  
+          splashColor: Colors.redAccent,
+          onPressed: (){
+            unfollowEvent(UserInstance().getUser().getID(),widget.event).then((value){
+              setState(() {
+                isFollowed = value;
+              });
+              widget.callBack();
+            });
+          }
+        )
+      );
+    }
+    return Container(
+      child: children[0]
+    );
   }
 }

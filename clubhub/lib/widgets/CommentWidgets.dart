@@ -27,7 +27,7 @@ class CommentCard extends StatelessWidget {
           children: <Widget>[
             Text(
               comment.getDateString() + " at " + comment.getTimeString(),
-              style: TextStyle(color: Colors.blue)
+              style: TextStyle(color: Colors.red)
               ),
             Text(
               comment.getContent(),
@@ -87,12 +87,8 @@ class _CommentListState extends State<CommentList> {
         children.add(CommentCard(comment: c, user: users[c.getUserID()]));
       }
     }
-    return Container(
-      child: ListView(
-      children: children
-      ),
-      width: double.maxFinite
-    );
+    return Expanded(child: ListView(children: children));
+
   }
 
 

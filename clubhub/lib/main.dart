@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:clubhub/widgets/ClubWidgets.dart';
 import 'package:clubhub/widgets/EventWidgets.dart';
 import 'package:clubhub/auth.dart';
+import 'package:clubhub/views/calendarPage.dart';
 
 void main() => runApp(MyApp());
 
@@ -20,7 +21,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.red,
       ),
         home: LoginPage() 
     );
@@ -58,7 +59,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   static List<Widget> _widgetOptions = <Widget>[
     EventList(),
-    CommentList("123"),
+    CalendarPage(),
     ClubList(),
   ];
 

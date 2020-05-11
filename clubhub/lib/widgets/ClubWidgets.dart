@@ -13,6 +13,7 @@ import 'package:clubhub/views/clubProfile.dart';
 
 
 
+
 /// [Stateless widget] that displays a clubs information in a [Card] format
 ///Used https://api.flutter.dev/flutter/material/Card-class.html for reference
 class ClubCard extends StatelessWidget {
@@ -20,8 +21,10 @@ class ClubCard extends StatelessWidget {
   final Function callBack;
   const ClubCard({Key key, this.club, this.callBack}): super(key:key); 
 
+
   @override
   Widget build(BuildContext context){
+
     return InkWell(
       child: Center(
         child: Card(
@@ -57,6 +60,7 @@ class _ClubListState extends State<ClubList>{
   List<Club> _clubs; // State of the club list 
   int _filterIndex = 0;
   List<List<Club>> _clubMaster = new List(2); // Contains the club lists for each filter (0,1)
+  List<Color> colors = [Colors.red,Colors.black];
   
   @override
   void initState() {
@@ -139,7 +143,10 @@ class _ClubListState extends State<ClubList>{
     ButtonBar buttons = new ButtonBar(children: 
       <Widget>[
         MaterialButton(
-          child: Text("All clubs"),
+          child: Text(
+            "All clubs",
+            style: TextStyle(color: colors[0]),
+            ),
           onPressed: (){ 
                setState(() {
                 _clubs = null;
@@ -150,6 +157,8 @@ class _ClubListState extends State<ClubList>{
                   _filterIndex = 0;
                   _clubMaster[_filterIndex] = value;
                   _clubs = _clubMaster[_filterIndex];
+                  colors[_filterIndex] = Colors.red;
+                  colors[1] = Colors.black;
                   //_clubs = filterClubSearch(_clubMaster[_filterIndex], _searchFilter);
                  // _clubs = value;
                 }
@@ -157,7 +166,9 @@ class _ClubListState extends State<ClubList>{
             });},
         ),
         MaterialButton(
-          child: Text("Followed"),
+          child: Text("Followed",
+            style: TextStyle(color: colors[1]),
+          ),
           onPressed: (){
             setState(() {
                 _clubs = null;
@@ -167,6 +178,8 @@ class _ClubListState extends State<ClubList>{
                  _filterIndex = 1;
                  _clubMaster[_filterIndex] = value;
                  _clubs = _clubMaster[_filterIndex];
+                  colors[_filterIndex] = Colors.red;
+                  colors[0] = Colors.black;
                  //_clubs = filterClubSearch(_clubMaster[_filterIndex], _searchFilter);
               });
             });},
